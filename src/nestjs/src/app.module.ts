@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
+import { UserEntity } from './auth/entities/user.entity';
 
 //@Module({
 //  imports: [TypeOrmModule.forRoot({
@@ -11,9 +13,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 //      username: process.env.POSTGRES_USER,
 //      password: process.env.POSTGRES_PASSWORD,
 //      database: process.env.POSTGRES_DB,
-//      entities: [],
+//      entities: [UserEntity],
 //      synchronize: true,
-//    })],
+//    }), AuthModule],
 //  controllers: [AppController],
 //  providers: [AppService],
 //})
@@ -28,9 +30,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: "user",
       password: "1234",
       database: "pong_db",
-      entities: [],
+      entities: [UserEntity],
       synchronize: true,
-    })],
+    }),
+    AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
