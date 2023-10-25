@@ -16,52 +16,52 @@ services:
     networks:
       - dataflow_network
 
-  pgadmin:
-    container_name: pgadmin
-    build:
-      context: ./src/pgadmin
-    restart: always
-    ports:
-      - "8081:80"
-    depends_on:
-      - postgresql
-    env_file: .env
-    networks:
-      - dataflow_network
-
-  nestjs:
-    container_name: nestjs
-    build:
-      context: ./src/nestjs
-    restart: always
-    env_file:
-      - .env
-    ports:
-      - "3000:3000"
-    depends_on:
-      - postgresql
-    environment:
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}
-    volumes:
-      - ./src/nestjs:/app
-      #- image-data:/app/vuejs/uploads
-    networks:
-      - dataflow_network
-  
-  reactjs:
-    container_name: reactjs
-    env_file:
-      - .env
-    build:
-      context: ./src/reactjs
-      dockerfile: Dockerfile # Assurez-vous que le Dockerfile ReactJS est correctement configuré
-    volumes:
-      - ./src/reactjs:/app
-      - image-data:/app/reactjs/uploads
-    ports:
-      - "8080:8080" # Port de votre application ReactJS
-    networks:
-      - dataflow_network
+  #pgadmin:
+  #  container_name: pgadmin
+  #  build:
+  #    context: ./src/pgadmin
+  #  restart: always
+  #  ports:
+  #    - "8081:80"
+  #  depends_on:
+  #    - postgresql
+  #  env_file: .env
+  #  networks:
+  #    - dataflow_network
+#
+  #nestjs:
+  #  container_name: nestjs
+  #  build:
+  #    context: ./src/nestjs
+  #  restart: always
+  #  env_file:
+  #    - .env
+  #  ports:
+  #    - "3000:3000"
+  #  depends_on:
+  #    - postgresql
+  #  environment:
+  #    - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgresql:5432/${POSTGRES_DB}
+  #  volumes:
+  #    - ./src/nestjs:/app
+  #    #- image-data:/app/vuejs/uploads
+  #  networks:
+  #    - dataflow_network
+  #
+  #reactjs:
+  #  container_name: reactjs
+  #  env_file:
+  #    - .env
+  #  build:
+  #    context: ./src/reactjs
+  #    dockerfile: Dockerfile # Assurez-vous que le Dockerfile ReactJS est correctement configuré
+  #  volumes:
+  #    - ./src/reactjs:/app
+  #    - image-data:/app/reactjs/uploads
+  #  ports:
+  #    - "8080:8080" # Port de votre application ReactJS
+  #  networks:
+  #    - dataflow_network
 
 networks:
   dataflow_network:
