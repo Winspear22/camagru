@@ -15,7 +15,7 @@ export class AuthController
   }
 
   @UseGuards(Auth42Guard)
-  @Post("User42SignUp")
+  @Get("User42SignUp")
   async User42SignUp()
   {
 	console.log("JE SUIS ICI !!!!");
@@ -24,6 +24,7 @@ export class AuthController
   @Get("User42CallBack")
   async User42CallBack()
   {
+	console.log("Le callback a été fait");
 
   }
 

@@ -11,7 +11,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
     super({
       clientID: 'u-s4t2ud-c48b94c3db2dc0796bd44029a543a951460881fabe7215fdac1da2a0cd5fe33c',//process.env.FORTYTWO_CLIENT_ID,
       clientSecret: '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',//process.env.FORTYTWO_CLIENT_SECRET,
-      callbackURL: 'http://' + 'localhost' + ':3000/auth/User42CallBack',
+      callbackURL: 'http://localhost:3000/auth/User42CallBack',
       passReqToCallBack: true,
       scopes: ['profile'],
     });
@@ -39,7 +39,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
       user = await this.userService.FindAndUpdateUser(user.username, { user_status: 'Online' });
       return cb(null, user);
     }
-    const newUser = await this.userService.createUser(userDet);
-    return cb(null, newUser);*/
+    const newUser = await this.userService.createUser(userDet);*/
+    return cb(null);
   }
 }
