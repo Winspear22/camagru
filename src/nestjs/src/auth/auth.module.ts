@@ -5,13 +5,6 @@ import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { IntraStrategy } from './strategies/42.strategy';
 
-/*@Module({
-    imports: [PassportModule.register({ defaultStrategy: '42' })],
-    controllers: [AuthController],
-    providers: [AuthService],
-  })
-  export class AuthModule {}*/
-
 @Module({
 	imports: [PassportModule.register({ defaultStrategy: '42' })],
 	controllers: [AuthController],
