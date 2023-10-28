@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, Delete, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { Request as ExpressRequest } from 'express';
@@ -28,5 +28,10 @@ export class AuthController
   {
 	  const code = this.authService.getCodeFromURL(req.url);
     return await this.authService.User42SignIn(code);
+  }
+
+  @Delete('deleteAllData')
+  async deleteAllData(@Body() username: string) {
+    return this.authService.deleteUser(username);
   }
 }

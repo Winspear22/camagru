@@ -1,4 +1,4 @@
-import { Injectable, Res, Req, Inject } from '@nestjs/common';
+import { Injectable, Res, Req, Inject, NotFoundException } from '@nestjs/common';
 import { UserEntity } from './entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import axios from 'axios';
@@ -53,6 +53,7 @@ export class AuthService
       if (user)
       {
         console.log("user already exists");
+        console.log(user);
         return user;
       }
       const newUser = this.usersRepository.create({
@@ -136,6 +137,27 @@ export class AuthService
       console.error("Error in getUserToken:", error.message);
       return { success: false };
     }
+  }
+
+  async deleteAllData(): Promise<string> {
+    try {
+      // Supprimez toutes les entrées de la table "UserEntity"
+      await this.usersRepository.clear();
+      return 'Toutes les données ont été supprimées avec succès.';
+    } catch (error) {
+      throw new Error('Une erreur s\'est produite lors de la suppression des données.');
+    }
+  }
+
+  async deleteUser(idOrUsername: string): Promise<string> {
+    const user = await this.usersRepository.findOne({ where: [{ username: idOrUsername }] });
+
+    if (!user) {
+      throw new NotFoundException('Utilisateur non trouvé.');
+    }
+
+    await this.usersRepository.remove(user);
+    return 'Utilisateur supprimé avec succès.';
   }
 
 }
