@@ -1,12 +1,12 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Auth42Guard } from './guards/42.guard';
-import { IntraStrategy } from './strategies/42.strategy';
+import { Response } from 'express';
+import { Request as ExpressRequest } from 'express';
 
 @Controller('auth')
 export class AuthController 
 {
-  constructor(private readonly appService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('basicUserSignUp')
   async BasicUserSubscription()
@@ -14,22 +14,19 @@ export class AuthController
 
   }
 
-  @UseGuards(Auth42Guard)
   @Get("User42SignUp")
-  async User42SignUp()
+  async User42SignUp(@Res({ passthrough: true }) res: Response)
   {
-	console.log("JE SUIS ICI !!!!");
+	  const redirectionURL = this.authService.redirectTo42SignIn(res);
+	  return res.redirect(redirectionURL);
   }
 
   @Get("User42CallBack")
-  async User42CallBack()
+  async User42CallBack(
+  @Res({ passthrough: true }) res: Response,
+  @Req() req: ExpressRequest) 
   {
-	console.log("Le callback a été fait");
-
-  }
-
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+	  const code = this.authService.getCodeFromURL(req.url);
+    return await this.authService.User42SignIn(code);
   }
 }

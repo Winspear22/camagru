@@ -33,6 +33,8 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
       login: profile._json.login,
     };
     console.log(userDet);
+    console.log(accessToken);
+    console.log(refreshToken);
     /*let user = await this.userService.findUserBy42Id(userDet.providerId);
     if (user) 
     {
@@ -40,6 +42,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
       return cb(null, user);
     }
     const newUser = await this.userService.createUser(userDet);*/
+    //return cb(null, user);
     return cb(null);
   }
 }

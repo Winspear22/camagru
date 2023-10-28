@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+/*import logo from './logo.svg';
 import './App.css';
 
 function App() {
@@ -22,4 +22,23 @@ function App() {
   );
 }
 
+export default App;*/
+
+import React from 'react';
+
+function App() {
+  const login = () => {
+    window.location.href = 'http://localhost:3000/auth/User42SignUp';
+  };
+
+  return (
+    <div>
+      <button onClick={login} className="login-btn">
+        <span>Se connecter</span>
+      </button>
+    </div>
+  );
+}
+
 export default App;
+
