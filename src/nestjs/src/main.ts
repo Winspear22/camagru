@@ -13,12 +13,13 @@ async function bootstrap()
 {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.use(cookieParser());
-  app.use(passport.initialize());
+  //app.use(passport.initialize());
   app.enableCors({
     origin: true,
     credentials: true
   });
   app.useGlobalPipes(new ValidationPipe());
+  console.log(process.env.POSTGRES_HOST);
   await app.listen(3000);
 }
 bootstrap();

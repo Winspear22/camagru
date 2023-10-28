@@ -16,5 +16,9 @@ export class UserService
   {
     return await this.usersRepository.findOneBy({ username });
   }
+
+  async createUser42()
+  {
+  }
   
 }

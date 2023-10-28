@@ -1,6 +1,6 @@
-import { Injectable, Res, Req } from '@nestjs/common';
+import { Injectable, Res, Req, Inject } from '@nestjs/common';
 import { UserEntity } from './entities/user.entity';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import axios from 'axios';
 import { Response } from 'express';
 import { Request as ExpressRequest } from 'express';
@@ -10,6 +10,10 @@ import { Request as ExpressRequest } from 'express';
 @Injectable()
 export class AuthService 
 {
+  constructor(
+    @Inject('USER_REPOSITORY')
+    private usersRepository: Repository<UserEntity>,
+  ) {}
   getHello(): string {
     return 'Hello World!';
   }
@@ -45,8 +49,23 @@ export class AuthService
       const request = await axios.get("https://api.intra.42.fr/v2/me", { headers: { Authorization: `Bearer ${personnal42Token.access_token}` } });
       console.log(request.data.login);
       console.log(request.data.id);
+      const user = await this.usersRepository.findOneBy({ username: request.data.login });
+      if (user)
+      {
+        console.log("user already exists");
+        return user;
+      }
+      const newUser = this.usersRepository.create({
+        username: request.data.login,
+        generatedId: request.data.id,
+        email: request.data.email
+      });
 
+      await this.usersRepository.save(newUser);
+      console.log(newUser);
+      return (newUser);
 
+  
       /* const request = await axios.get("https://api.intra.42.fr/v2/me", { headers: { Authorization: `Bearer ${personnal42Token.access_token}` } });
         let user = await this.prismaService.user.findUnique({ where: { login: request.data.login } });
         if (!user) {

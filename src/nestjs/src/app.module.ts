@@ -3,8 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { databaseProviders } from './database.providers';
-
 
 //@Module({
 //  imports: [TypeOrmModule.forRoot({
@@ -25,18 +23,7 @@ import { databaseProviders } from './database.providers';
 
 // Qd NestJS est en dehors de contenur
 @Module({
-  imports: [/*TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: '172.18.0.2',
-      port: 5432,
-      username: "user",
-      password: "1234",
-      database: "pong_db",
-      entities: [UserEntity],
-      synchronize: true,
-    })*/
-    AuthModule,
-    UserModule],
+  imports: [AuthModule, UserModule],
   controllers: [AppController],
   providers: [AppService],
   exports: []
