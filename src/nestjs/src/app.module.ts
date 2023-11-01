@@ -3,10 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { UserController } from './user/user.controller';
-import { AuthController } from './auth/auth.controller';
-import { UserService } from './user/user.service';
-import { AuthService } from './auth/auth.service';
+import { MailModule } from './mail/mail.module';
+import { ConfigModule } from '@nestjs/config';
 
 //@Module({
 //  imports: [TypeOrmModule.forRoot({
@@ -27,7 +25,12 @@ import { AuthService } from './auth/auth.service';
 
 // Qd NestJS est en dehors de contenur
 @Module({
-  imports: [AuthModule, UserModule],
+  imports: [ConfigModule.forRoot({
+    isGlobal: true, // no need to import into other modules
+  }),
+  AuthModule,
+  UserModule,
+  MailModule],
   controllers: [AppController],
   providers: [AppService],
 })

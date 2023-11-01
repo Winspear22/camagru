@@ -7,9 +7,10 @@ import { UserProviders } from './entities/user.provider';
 import { DatabaseModule } from 'src/database/database.module';
 import { UserModule } from 'src/user/user.module'; // Assurez-vous d'importer UserModule ici
 import { UserService } from 'src/user/user.service';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
-    imports: [UserModule, DatabaseModule], // Ajoutez UserModule ici
+    imports: [UserModule, DatabaseModule, MailModule], // Ajoutez UserModule ici
     controllers: [AuthController],
     providers: [AuthService, ...UserProviders],
 	exports: [AuthService] 

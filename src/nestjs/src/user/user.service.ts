@@ -3,6 +3,7 @@ import { AxiosResponse } from "axios";
 import { UserEntity } from "src/auth/entities/user.entity";
 import { Repository } from "typeorm";
 import * as EmailValidator from 'email-validator';
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UserService 
@@ -22,7 +23,7 @@ export class UserService
     return await this.usersRepository.findOneBy({generatedId});
   }
 
-  async createUser42(request: AxiosResponse): Promise <UserEntity | undefined>
+  async createUser42(request: AxiosResponse): Promise <UserEntity>
   {
     const user = await this.getUserByUsername(request.data.login);
     if (!user)
@@ -47,7 +48,7 @@ export class UserService
       return newUser;
     }
     console.log("L'utilisateur existe déjà : ", user);
-    return (user);
+    return user;
   }
 
   async generateUniqueRandomId(): Promise<number> {
@@ -86,12 +87,17 @@ export class UserService
       const emailValidated = EmailValidator.validate(userInput.email);
       if (emailValidated === false)
         return { success: false, user: undefined };
-
+      const saltRounds = 12;
+      const salt = await bcrypt.genSalt(saltRounds);
+      const hashedPassword = await bcrypt.hash(userInput.password, salt);
+      
       const newUser = this.usersRepository.create({
       username: newUsername,
       generatedId: await this.generateUniqueRandomId(),
-      email: userInput.email
+      email: userInput.email,
+      password: hashedPassword
       });
+      return newUser;
     }
   }
 

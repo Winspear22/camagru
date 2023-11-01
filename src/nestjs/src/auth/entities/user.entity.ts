@@ -16,6 +16,9 @@ export class UserEntity
 	username: string;
 
 	@Column({ nullable: true })
+	password: string;
+
+	@Column({ nullable: true })
 	generatedId: number;
 
 	@Column({ nullable: true })

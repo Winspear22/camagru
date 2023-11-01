@@ -19,7 +19,7 @@ async function bootstrap()
     credentials: true
   });
   app.useGlobalPipes(new ValidationPipe());
-  console.log(process.env.POSTGRES_HOST);
+  console.log(process.env.EMAIL_SENDER);
   await app.listen(3000);
 }
 bootstrap();

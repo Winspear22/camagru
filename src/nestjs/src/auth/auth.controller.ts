@@ -2,12 +2,15 @@ import { Controller, Get, Post, Req, Res, Delete, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { Request as ExpressRequest } from 'express';
+import { MailService } from 'src/mail/mail.service';
+import { UserEntity } from './entities/user.entity';
 
 @Controller('auth')
 export class AuthController 
 {
   constructor(
     private readonly authService: AuthService,
+    private readonly mailService: MailService,
     ) {}
 
   @Post('basicUserSignUp')
@@ -33,6 +36,12 @@ export class AuthController
   @Req() req: ExpressRequest) 
   {
 	  const code = this.authService.getCodeFromURL(req.url);
-    return await this.authService.User42SignIn(code);
+    const token = Math.floor(1000 + Math.random() * 9000).toString();
+    const user = await this.authService.User42SignIn(code);
+    if (user instanceof UserEntity)
+      await this.mailService.sendUserConfirmation(user, token);
+    else
+      console.log("Je suis NULL dans User42CallBack");
+
   }
 }
