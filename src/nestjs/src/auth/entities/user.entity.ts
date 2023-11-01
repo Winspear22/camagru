@@ -23,4 +23,7 @@ export class UserEntity
 
 	@Column({ nullable: true })
 	email: string;
+
+	@Column({nullable: true})
+	user_status: string;
 }

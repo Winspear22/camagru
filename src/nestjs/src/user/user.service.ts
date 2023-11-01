@@ -41,7 +41,8 @@ export class UserService
       const newUser = this.usersRepository.create({
         username: newUsername,
         generatedId: request.data.id,
-        email: request.data.email
+        email: request.data.email,
+        user_status: "Online"
       });
       await this.usersRepository.save(newUser);
       console.log("L'utilisateur n'existe pas et vient d'être créet", newUser);
@@ -95,7 +96,8 @@ export class UserService
       username: newUsername,
       generatedId: await this.generateUniqueRandomId(),
       email: userInput.email,
-      password: hashedPassword
+      password: hashedPassword,
+      user_status: "Online"
       });
       return newUser;
     }

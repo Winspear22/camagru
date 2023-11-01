@@ -1,44 +1,28 @@
-/*import logo from './logo.svg';
+import React from 'react';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
-
-export default App;*/
-
-import React from 'react';
-
-function App() {
+export default function App() 
+{
   const login = () => {
     window.location.href = 'http://localhost:3000/auth/User42SignUp';
   };
 
+  const loginMdp = () => {
+    window.location.href = 'http://localhost:3000/auth/basicUserSignUp';
+  };
+
   return (
-    <div>
-      <button onClick={login} className="login-btn">
-        <span>Se connecter</span>
-      </button>
-    </div>
+    <>
+      <div>
+        <button onClick={login} className="login-btn">
+          <span className='red-text'>Se connecter via 42</span>
+        </button>
+      </div>
+      <div>
+        <button onClick={loginMdp} className="login-btn">
+          <span className='red-text'>Se connecter via mdp</span>
+        </button>
+      </div>
+    </>
   );
 }
-
-export default App;
-

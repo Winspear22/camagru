@@ -28,6 +28,10 @@
   color: #61dafb;
 }
 
+.red-text {
+  color: red; /* Applique la couleur rouge au texte avec la classe "red-text" */
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
