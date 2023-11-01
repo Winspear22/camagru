@@ -1,22 +1,16 @@
-import { Injectable, Res, Req, Inject, NotFoundException } from '@nestjs/common';
-import { UserEntity } from './entities/user.entity';
-import { DataSource, Repository } from 'typeorm';
+import { Injectable, Res, Req, Inject, NotFoundException, Body } from '@nestjs/common';
 import axios from 'axios';
 import { Response } from 'express';
 import { Request as ExpressRequest } from 'express';
-
+import { UserService } from 'src/user/user.service';
 
 
 @Injectable()
 export class AuthService 
 {
   constructor(
-    @Inject('USER_REPOSITORY')
-    private usersRepository: Repository<UserEntity>,
+    private usersService: UserService,
   ) {}
-  getHello(): string {
-    return 'Hello World!';
-  }
 
   redirectTo42SignIn(@Res({ passthrough: true }) res: Response)
   {
@@ -49,58 +43,9 @@ export class AuthService
       const request = await axios.get("https://api.intra.42.fr/v2/me", { headers: { Authorization: `Bearer ${personnal42Token.access_token}` } });
       console.log(request.data.login);
       console.log(request.data.id);
-      const user = await this.usersRepository.findOneBy({ username: request.data.login });
-      if (user)
-      {
-        console.log("user already exists");
-        console.log(user);
-        return user;
-      }
-      const newUser = this.usersRepository.create({
-        username: request.data.login,
-        generatedId: request.data.id,
-        email: request.data.email
-      });
-
-      await this.usersRepository.save(newUser);
-      console.log(newUser);
-      return (newUser);
-
-  
-      /* const request = await axios.get("https://api.intra.42.fr/v2/me", { headers: { Authorization: `Bearer ${personnal42Token.access_token}` } });
-        let user = await this.prismaService.user.findUnique({ where: { login: request.data.login } });
-        if (!user) {
-            let username = request.data.login;
-            if (await this.prismaService.user.findUnique({ where: { username: username } })) {
-                let i = 1;
-                while (await this.prismaService.user.findUnique({ where: { username: username + String(i) } }))
-                    i++;
-                username = username + String(i);
-            }
-            let user = await this.prismaService.createUser({ username: username, login: request.data.login, avatar: request.data.image.versions.small, personnal42Token: personnal42Token.access_token });
-            const payload = { id: user.id };
-            const accessToken: string = await this.jwtService.sign(payload, { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '45m' });
-            const refreshToken: string = await this.jwtService.sign(payload, { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '10d' });
-            user = await this.prismaService.user.update({ where: { username: username }, data: { accessToken: accessToken, refreshToken: refreshToken } });
-            return {
-                success: true,
-                refreshToken: user.refreshToken,
-                accessToken: user.accessToken,
-                username: user.username,
-                twoFa: user.enabled2FA,
-            };
-        }
-        user = await this.prismaService.user.update({ where: { login: request.data.login }, data: { personnal42Token: personnal42Token.access_token } });
-        if (user.status != "offline")
-            return { success: false, error: "user already connected" };
-        return {
-            success: true,
-            refreshToken: user.refreshToken,
-            accessToken: user.accessToken,
-            username: user.username,
-            twoFa: user.enabled2FA,
-        };*/
-        console.log("SUCCESS !!!", personnal42Token);
+      const user = await this.usersService.createUser42(request);
+      console.log("SUCCESS !!!", personnal42Token);
+      return user;
     }
     catch (err) 
     {
@@ -139,25 +84,19 @@ export class AuthService
     }
   }
 
-  async deleteAllData(): Promise<string> {
-    try {
-      // Supprimez toutes les entrées de la table "UserEntity"
-      await this.usersRepository.clear();
-      return 'Toutes les données ont été supprimées avec succès.';
-    } catch (error) {
-      throw new Error('Une erreur s\'est produite lors de la suppression des données.');
+  async BasicUserSignIn(@Body() userInput: {
+    username: string,
+    password: string,
+    email: string
+  })
+  {
+    try
+    {
+      const user = await this.usersService.createBasicUser(userInput);
+    }
+    catch (err)
+    {
+      console.log(err);
     }
   }
-
-  async deleteUser(idOrUsername: string): Promise<string> {
-    const user = await this.usersRepository.findOne({ where: [{ username: idOrUsername }] });
-
-    if (!user) {
-      throw new NotFoundException('Utilisateur non trouvé.');
-    }
-
-    await this.usersRepository.remove(user);
-    return 'Utilisateur supprimé avec succès.';
-  }
-
 }

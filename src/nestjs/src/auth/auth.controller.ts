@@ -6,12 +6,18 @@ import { Request as ExpressRequest } from 'express';
 @Controller('auth')
 export class AuthController 
 {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    ) {}
 
   @Post('basicUserSignUp')
-  async BasicUserSubscription()
+  async BasicUserSubscription(@Body() userInput: { 
+  username: string, 
+  password: string,
+  email: string
+  })
   {
-
+    return await this.authService.BasicUserSignIn(userInput);
   }
 
   @Get("User42SignUp")
@@ -28,10 +34,5 @@ export class AuthController
   {
 	  const code = this.authService.getCodeFromURL(req.url);
     return await this.authService.User42SignIn(code);
-  }
-
-  @Delete('deleteAllData')
-  async deleteAllData(@Body() username: string) {
-    return this.authService.deleteUser(username);
   }
 }

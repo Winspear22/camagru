@@ -11,7 +11,7 @@ import { DataSource } from 'typeorm';
           port: 5432,
           username: 'user',
           password: '1234',
-          database: 'pong_db',
+          database: 'camagru_db',
           entities: [UserEntity],
           synchronize: true,
         });
@@ -27,11 +27,11 @@ export const databaseProviders = [
     useFactory: async () => {
       const dataSource = new DataSource({
         type: 'postgres',
-        host: '172.20.0.2',
+        host: '172.19.0.2',//process.env.POSTGRES_HOST,
         port: parseInt(process.env.POSTGRES_PORT, 10),
         username: process.env.POSTGRES_USER,//'user',
         password: process.env.POSTGRES_PASSWORD,//'1234',
-        database: 'pong_db',//process.env.POSTGRES_DB,//'pong_db',
+        database: 'camagru_db',//process.env.POSTGRES_DB,//'camagru_db',
         entities: [UserEntity],
         synchronize: true,
       });
