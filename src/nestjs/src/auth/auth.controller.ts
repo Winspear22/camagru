@@ -39,7 +39,7 @@ export class AuthController
     if (user instanceof UserEntity)
       await this.mailService.sendUserConfirmation(user, token);
     else
-      console.log("Je n'ai pasréussi à récupérer l'user, je suis NULL dans User42CallBack");
+      console.log("Je n'ai pas réussi à récupérer l'user, je suis NULL dans User42CallBack");
   }
 
   @Get("Logout")

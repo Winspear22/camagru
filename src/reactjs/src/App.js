@@ -1,5 +1,8 @@
 import React from 'react';
 import './App.css';
+import Main from './components/Main.component';
+import { BrowserRouter } from 'react-router-dom';
+
 
 export default function App() 
 {
@@ -14,6 +17,9 @@ export default function App()
   return (
     <>
       <div>
+        <BrowserRouter>
+          <Main />
+        </BrowserRouter>
         <button onClick={login} className="login-btn">
           <span className='red-text'>Se connecter via 42</span>
         </button>
