@@ -92,10 +92,16 @@ export class AuthService
   {
     try
     {
+      console.log("JE SUIS ICIIIIIIII 2");
+
       const user = await this.usersService.createBasicUser(userInput);
+      console.log("JE SUIS ICIIIIIIII 3");
+      return user;
+
     }
     catch (err)
     {
+      console.log("JE SUIS ICIIIIIIII 4");
       console.log(err);
     }
   }

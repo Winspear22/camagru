@@ -87,7 +87,10 @@ export class UserService
       }
       const emailValidated = EmailValidator.validate(userInput.email);
       if (emailValidated === false)
+      {
+        console.log("JE SUIS ICIIIIIIII 5");
         return { success: false, user: undefined };
+      }
       const saltRounds = 12;
       const salt = await bcrypt.genSalt(saltRounds);
       const hashedPassword = await bcrypt.hash(userInput.password, salt);
@@ -99,6 +102,8 @@ export class UserService
       password: hashedPassword,
       user_status: "Online"
       });
+      console.log("JE SUIS ICIIIIIIII 6");
+      await this.usersRepository.save(newUser);
       return newUser;
     }
   }

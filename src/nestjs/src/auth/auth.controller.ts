@@ -22,7 +22,22 @@ export class AuthController
   email: string
   })
   {
-    return await this.authService.BasicUserSignIn(userInput);
+    try {
+      
+      return await this.authService.BasicUserSignIn(userInput);
+    }
+    catch (error)
+    {
+      console.log("ERREUR :", userInput);
+
+      throw new HttpException({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: 'Error in creation of classic user.',
+      }, HttpStatus.INTERNAL_SERVER_ERROR, {
+        cause: error
+      });
+    }
+
   }
 
   @Get("User42SignUp")
