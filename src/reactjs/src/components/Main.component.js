@@ -1,11 +1,14 @@
 import React from "react";
-import Header from './header and footer/Header.component';
+/*import Header from './header and footer/Header.component';
 import Footer from './header and footer/Footer.component';
 import Auth from './auth/Auth.Component';
-import Home from './Home.Component';
-import { Switch, Route, Redirect, withRouter } from 'react-router-dom';
+import Home from './Home.Component';*/
+//import { ReactDOM } from 'react-dom/client';
+import * as ReactDOM from 'react-dom/client';
+import App from "../App";
+import { BrowserRouter } from 'react-router-dom';
 
-function Main()
+/*function Main()
 {
 	return (
 		<React.Fragment>
@@ -13,6 +16,7 @@ function Main()
 				<Switch>
 					<Route path='/auth' component={Auth}/>
 					<Route path='/home' component={Home}/>
+
 					<Redirect to='/home'/>
 
 				</Switch>
@@ -21,4 +25,13 @@ function Main()
 	);
 }
 
-export default withRouter(Main);
+export default withRouter(Main);*/
+
+/*const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+	<React.StrictMode>
+		<BrowserRouter>
+			<App />
+		</BrowserRouter>
+	</React.StrictMode>
+)*/
