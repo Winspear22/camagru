@@ -1,10 +1,12 @@
-import { Body, Inject, Injectable } from "@nestjs/common";
+import { Body, Inject, Injectable, NotAcceptableException } from "@nestjs/common";
 import { AxiosResponse } from "axios";
 import { UserEntity } from "src/auth/entities/user.entity";
 import { Repository } from "typeorm";
 import * as EmailValidator from 'email-validator';
 import * as bcrypt from 'bcrypt'
 
+
+// Ne pas oublier de remplacer tous les getUsername pardes getby id
 @Injectable()
 export class UserService 
 {
@@ -25,7 +27,7 @@ export class UserService
 
   async createUser42(request: AxiosResponse): Promise <UserEntity>
   {
-    const user = await this.getUserByUsername(request.data.login);
+    var user = await this.getUserByUsername(request.data.login);
     if (!user)
     {
       let newUsername = request.data.login;
@@ -48,7 +50,11 @@ export class UserService
       console.log("L'utilisateur n'existe pas et vient d'être créet", newUser);
       return newUser;
     }
-    console.log("L'utilisateur existe déjà : ", user);
+    await this.usersRepository.update({ generatedId: user.generatedId }, {
+      user_status: "Online"
+    });
+    user = await this.getUserByUsername(user.username);
+    console.log("L'utilisateur existe déjà et son statut a été mis à jour : ", user);
     return user;
   }
 
@@ -72,39 +78,46 @@ export class UserService
     email: string
   })
   {
-    const user = await this.getUserByUsername(userInput.username);
-    if (!user)
+    try
     {
-      let newUsername = userInput.username;
-      const doesUsernameAlreadyExist = await this.getUserByUsername(newUsername);
-      if (doesUsernameAlreadyExist)
+      const user = await this.getUserByUsername(userInput.username);
+      if (!user)
       {
-        let i = 1;
-        while (await this.getUserByUsername(newUsername))
-          i++;
-        newUsername = newUsername + String(i);
-        console.log(newUsername);
+        let newUsername = userInput.username;
+        const doesUsernameAlreadyExist = await this.getUserByUsername(newUsername);
+        if (doesUsernameAlreadyExist)
+        {
+          let i = 1;
+          while (await this.getUserByUsername(newUsername))
+            i++;
+          newUsername = newUsername + String(i);
+          console.log(newUsername);
+        }
+        const emailValidated = EmailValidator.validate(userInput.email);
+        if (emailValidated === false)
+        {
+          console.log("JE SUIS ICIIIIIIII 5");
+          throw new NotAcceptableException("L'email que vous venez d'écrire n'est dans un format acceptatble !");
+        }
+        const saltRounds = 12;
+        const salt = await bcrypt.genSalt(saltRounds);
+        const hashedPassword = await bcrypt.hash(userInput.password, salt);
+        
+        const newUser = this.usersRepository.create({
+        username: newUsername,
+        generatedId: await this.generateUniqueRandomId(),
+        email: userInput.email,
+        password: hashedPassword,
+        user_status: "Online"
+        });
+        console.log("JE SUIS ICIIIIIIII 6");
+        await this.usersRepository.save(newUser);
+        return newUser;
       }
-      const emailValidated = EmailValidator.validate(userInput.email);
-      if (emailValidated === false)
-      {
-        console.log("JE SUIS ICIIIIIIII 5");
-        return { success: false, user: undefined };
-      }
-      const saltRounds = 12;
-      const salt = await bcrypt.genSalt(saltRounds);
-      const hashedPassword = await bcrypt.hash(userInput.password, salt);
-      
-      const newUser = this.usersRepository.create({
-      username: newUsername,
-      generatedId: await this.generateUniqueRandomId(),
-      email: userInput.email,
-      password: hashedPassword,
-      user_status: "Online"
-      });
-      console.log("JE SUIS ICIIIIIIII 6");
-      await this.usersRepository.save(newUser);
-      return newUser;
+    }
+    catch (error)
+    {
+
     }
   }
 

@@ -21,9 +21,14 @@ export class UserEntity
 	@Column({ nullable: true, type: 'bigint' })
 	generatedId: number;
 	
-
 	@Column({ nullable: true })
 	email: string;
+
+	@Column({ nullable: true })
+	accessToken: string;
+
+	@Column({ nullable: true })
+	refreshToken: string
 
 	@Column({nullable: true})
 	user_status: string;

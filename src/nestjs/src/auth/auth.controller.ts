@@ -1,6 +1,6 @@
 import { Controller, 
   Get, Post, Req, Res, Body, 
-  HttpException, HttpStatus } from '@nestjs/common';
+  HttpException, HttpStatus, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { Request as ExpressRequest } from 'express';
@@ -20,24 +20,18 @@ export class AuthController
   username: string, 
   password: string,
   email: string
-  })
+  }, @Res({ passthrough: true}) res: Response)
   {
-    try {
-      
-      return await this.authService.BasicUserSignIn(userInput);
+    try 
+    { 
+      await this.authService.BasicUserSignIn(userInput);
+      return res.redirect(process.env.IP_FRONTEND);
     }
     catch (error)
     {
       console.log("ERREUR :", userInput);
-
-      throw new HttpException({
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: 'Error in creation of classic user.',
-      }, HttpStatus.INTERNAL_SERVER_ERROR, {
-        cause: error
-      });
+      return error;
     }
-
   }
 
   @Get("User42SignUp")
@@ -50,17 +44,13 @@ export class AuthController
     }
     catch (error)
     {
-      throw new HttpException({
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: 'Error in redirecting toward the 42 API.',
-      }, HttpStatus.INTERNAL_SERVER_ERROR, {
-        cause: error
-      });
+      return error;
     }
   }
 
   @Get("User42CallBack")
-  async User42CallBack(@Req() req: ExpressRequest) 
+  async User42CallBack(@Req() req: ExpressRequest, 
+  @Res({ passthrough: true }) res: Response) 
   {
     try 
     {
@@ -68,20 +58,19 @@ export class AuthController
       const token = Math.floor(1000 + Math.random() * 9000).toString();
       const user = await this.authService.User42SignIn(code);
       if (user instanceof UserEntity)
+      {
+
         await this.mailService.sendUserConfirmation(user, token);
+        return res.redirect(process.env.IP_FRONTEND);
+      }
       else
-        console.log("Je n'ai pas réussi à récupérer l'user, je suis NULL dans User42CallBack");
+        throw new NotFoundException("L\'utilisateur demandé n\'a pas été trouvé.");
     }
     catch (error)
     {
-      throw new HttpException({
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
-        error: 'Error in creating an user with the 42 API.',
-      }, HttpStatus.INTERNAL_SERVER_ERROR, {
-        cause: error
-      });
+      return error;
     }
-	}
+  }
 
   @Get("Logout")
   async UserLogout()
