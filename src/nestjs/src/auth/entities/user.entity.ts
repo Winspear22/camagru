@@ -1,10 +1,7 @@
 import { 
     Entity,
     Column,
-    PrimaryGeneratedColumn,
-    OneToMany,
-    OneToOne,
-    JoinColumn } from 'typeorm';
+    PrimaryGeneratedColumn } from 'typeorm';
   
 @Entity()
 export class UserEntity 
@@ -18,17 +15,17 @@ export class UserEntity
 	@Column({ nullable: true })
 	password: string;
 
-	@Column({ nullable: true, type: 'bigint' })
-	generatedId: number;
+    @Column({ type: 'varchar', length: 15, unique: true, nullable: true })
+    generatedId: string;
 	
 	@Column({ nullable: true })
 	email: string;
 
-	@Column({ nullable: true })
+	@Column({ type: 'text', nullable: true })
 	accessToken: string;
-
-	@Column({ nullable: true })
-	refreshToken: string
+  
+	@Column({ type: 'text', nullable: true })
+	refreshToken: string;
 
 	@Column({nullable: true})
 	user_status: string;

@@ -3,6 +3,8 @@ import axios from 'axios';
 import { Response } from 'express';
 import { Request as ExpressRequest } from 'express';
 import { UserService } from 'src/user/user.service';
+import { JwtService } from '@nestjs/jwt';
+import { UserEntity } from './entities/user.entity';
 
 
 @Injectable()
@@ -10,6 +12,7 @@ export class AuthService
 {
   constructor(
     private usersService: UserService,
+    private jwtService: JwtService
   ) {}
 
   redirectTo42SignIn(@Res({ passthrough: true }) res: Response)
@@ -108,14 +111,47 @@ export class AuthService
     }
   }
 
-  async CreateAndSignTokens(res: Response, generatedId: number)
+  async CreateTokensAndCookies(user: UserEntity,@Res({ passthrough: true }) res: Response)
   {
-    
+    try
+    {
+      const tokens = await this.CreateAndSignTokens(user.generatedId);
+      this.usersService.updateTokens(user.generatedId, tokens.accessToken, tokens.refreshToken);
+      this.CreateNewAccessCookie(
+        {
+          generatedId: user.generatedId,
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken
+        },
+        res,
+      );
+    }
+    catch (error)
+    {
+      throw error;
+    }
   }
 
-  async CreateAccessCookie()
+  async CreateAndSignTokens(generatedId: string) 
   {
+    const [new_access_token, new_refresh_token] = await Promise.all([
+      this.jwtService.signAsync({ sub: generatedId }, { secret: process.env.ACCESS_TOKEN, expiresIn: process.env.ACCESS_TOKEN_DURATION }),
+      this.jwtService.signAsync({ sub: generatedId }, { secret: process.env.REFRESH_TOKEN, expiresIn: process.env.REFRESH_TOKEN_DURATION })]);
+    return {accessToken: new_access_token, refreshToken: new_refresh_token};
+  }
 
+  async CreateNewAccessCookie(data: object, res: Response) 
+  {
+    const serializeData = JSON.stringify(data);
+    res.clearCookie('CamagruCookie', { path: '/' });
+    res.cookie('CamagruCookie', serializeData, {
+      sameSite: 'lax', // est une mesure de securite de type lax
+      httpOnly: false, // gere l'accessibilite du cookie par le naviguateur et javascript, true : inaccessible / false : accessible
+      secure: false, // doit etre mis sur false, sinon on ne peut pas envoyer sur des adresses http, que https
+      domain: process.env.COOKIE_DOMAIN, // site sur lequel le cookie est fonctionnel et sur lequel il peut etre envoye
+      maxAge: 900000000, // periode de vie du cookie en miliseconde, ici 10 jours
+      path: '/', // signifie que le cookie sera envoye dans chacune des requetes http sur le site made-f0cr5s6 en d'autres termes on sera authentifie partout
+    });
   }
 
 }

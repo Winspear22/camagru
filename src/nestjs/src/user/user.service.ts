@@ -1,4 +1,4 @@
-import { Body, Inject, Injectable, NotAcceptableException } from "@nestjs/common";
+import { Body, Inject, Injectable, InternalServerErrorException, NotAcceptableException } from "@nestjs/common";
 import { AxiosResponse } from "axios";
 import { UserEntity } from "src/auth/entities/user.entity";
 import { Repository } from "typeorm";
@@ -20,9 +20,27 @@ export class UserService
     return await this.usersRepository.findOneBy({ username });
   }
 
-  async getUserByGeneratedId(generatedId: number)
+  async getUserByGeneratedId(generatedId: string) { // Type changed to string
+    return await this.usersRepository.findOneBy({ generatedId });
+  }
+
+  async updateTokens(generatedId: string, accessToken: string, refreshToken: string)
   {
-    return await this.usersRepository.findOneBy({generatedId});
+    try
+    {
+      var user = await this.getUserByGeneratedId(generatedId);
+      if (!user)
+        throw new NotAcceptableException("User not found.");
+      
+      await this.usersRepository.update(generatedId, {
+        accessToken: accessToken,
+        refreshToken: refreshToken
+      });
+    }
+    catch (error)
+    {
+      throw error;
+    }
   }
 
   async createUser42(request: AxiosResponse): Promise <UserEntity>
@@ -58,18 +76,34 @@ export class UserService
     return user;
   }
 
-  async generateUniqueRandomId(): Promise<number> {
-    let maxTries = 30; // Limitez le nombre de tentatives pour éviter une boucle infinie
+  async generateUniqueRandomId(): Promise<string> 
+  {
+    const maxTries = 30; // Limitez le nombre de tentatives pour éviter une boucle infinie
+    const idLength = 15; // Longueur de l'ID à générer
 
-    while (maxTries > 0) {
-      maxTries--;
-      const randomId = Math.floor(Math.random() * 100_000_000_000) + 1;
+    for (let tries = 0; tries < maxTries; tries++) {
+      const randomId = this.generateRandomAlphanumericId(idLength);
       const userWithSameId = await this.getUserByGeneratedId(randomId);
-      if (!userWithSameId)
-        return randomId; // Le numéro est unique
+
+      if (!userWithSameId) {
+        return randomId; // L'ID est unique
+      }
     }
 
-    throw new Error('Impossible de générer un ID unique après 10 tentatives.');
+    throw new NotAcceptableException('Impossible de générer un ID unique après 30 tentatives.');
+  }
+
+  private generateRandomAlphanumericId(length: number): string 
+  {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const charactersLength = characters.length;
+
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+
+    return result;
   }
 
   async createBasicUser(@Body() userInput: {
@@ -117,9 +151,7 @@ export class UserService
     }
     catch (error)
     {
-
+      throw new InternalServerErrorException("Erreur dans la création de l'utilisateur basique.");
     }
   }
-
-
 }
